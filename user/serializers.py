@@ -8,6 +8,7 @@ from django.utils.translation import gettext as _
 class UserSerializer(serializers.ModelSerializer):
     bio = serializers.CharField(max_length=255, allow_blank=True, required=False)
     profile_image = serializers.ImageField(allow_null=True, required=False, validators=[validate_image_file_extension])
+    subscribers = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
     class Meta:
         model = get_user_model()
