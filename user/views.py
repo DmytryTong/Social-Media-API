@@ -8,7 +8,7 @@ from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.settings import api_settings
 
 from user.filters import UserFilter
-from user.serializers import UserSerializer, AuthTokenSerializer
+from user.serializers import UserSerializer, AuthTokenSerializer, UserListSerializer
 
 
 class CreateUserView(generics.CreateAPIView):
@@ -17,9 +17,11 @@ class CreateUserView(generics.CreateAPIView):
 
 class UserList(generics.ListAPIView):
     queryset = get_user_model().objects.all()
-    serializer_class = UserSerializer
+    serializer_class = UserListSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = UserFilter
+    filterset_fields = ["email"]
+    fields = ["email"]
 
 
 class CreateTokenView(ObtainAuthToken):

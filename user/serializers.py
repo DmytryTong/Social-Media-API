@@ -1,10 +1,14 @@
 from django.contrib.auth import get_user_model, authenticate
 from django.contrib.auth.models import User
+from django.core.validators import validate_image_file_extension
 from rest_framework import serializers
 from django.utils.translation import gettext as _
 
 
 class UserSerializer(serializers.ModelSerializer):
+    bio = serializers.CharField(max_length=255, allow_blank=True, required=False)
+    profile_image = serializers.ImageField(allow_null=True, required=False, validators=[validate_image_file_extension])
+
     class Meta:
         model = get_user_model()
         fields = ("id", "email", "password", "is_staff", "bio", "profile_image")
@@ -24,6 +28,14 @@ class UserSerializer(serializers.ModelSerializer):
             user.save()
 
         return user
+
+
+class UserListSerializer(serializers.ModelSerializer):
+    profile_image = serializers.ImageField()
+
+    class Meta:
+        model = get_user_model()
+        fields = ("email", "profile_image")
 
 
 class AuthTokenSerializer(serializers.Serializer):
