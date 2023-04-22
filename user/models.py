@@ -45,6 +45,11 @@ class User(AbstractUser):
 
     bio = models.CharField(max_length=255, blank=True)
     profile_image = models.ImageField(upload_to='profile_images/', blank=True)
+    subscribers = models.ManyToManyField(
+        'self',
+        related_name='subscriptions',
+        symmetrical=False
+    )
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []

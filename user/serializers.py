@@ -38,6 +38,16 @@ class UserListSerializer(serializers.ModelSerializer):
         fields = ("email", "profile_image")
 
 
+class UserDetailSerializer(serializers.ModelSerializer):
+    bio = serializers.CharField(max_length=255, allow_blank=True, required=False)
+    profile_image = serializers.ImageField(allow_null=True, required=False, validators=[validate_image_file_extension])
+    subscribers = UserListSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = get_user_model()
+        fields = ("id", "email", "is_staff", "bio", "profile_image", "subscribers")
+
+
 class AuthTokenSerializer(serializers.Serializer):
     email = serializers.CharField(label=_("Email"))
     password = serializers.CharField(
