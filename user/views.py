@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
+from django.db.models import Q
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, permissions, status
 from rest_framework.authentication import TokenAuthentication
@@ -66,3 +67,4 @@ class SubscribeView(generics.GenericAPIView):
         serializer = self.get_serializer(user)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
+
