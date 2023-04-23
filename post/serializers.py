@@ -1,15 +1,26 @@
 from rest_framework import serializers
-from .models import Post
+
+from user.serializers import UserSerializer
+from .models import Post, Tag
 
 
 class PostSerializer(serializers.ModelSerializer):
-    author = serializers.PrimaryKeyRelatedField(read_only=True, default=serializers.CurrentUserDefault())
+    tags = serializers.SlugRelatedField(
+        many=True, read_only=True, slug_field="name"
+    )
 
     class Meta:
         model = Post
-        fields = ['id', 'title', 'content', 'created_at', 'author']
+        fields = ["id", "author", "title", "content", "created_at", "tags"]
 
-    def validate_author(self, value):
-        if self.context['request'].user != value:
-            raise serializers.ValidationError("You can only create posts for yourself.")
-        return value
+
+class PostListSerializer(PostSerializer):
+    tags = serializers.SlugRelatedField(
+        many=True, read_only=True, slug_field="name"
+    )
+
+
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = ("id", "name")

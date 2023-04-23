@@ -2,16 +2,21 @@ from django.contrib.auth import get_user_model, authenticate
 from django.core.validators import validate_image_file_extension
 from rest_framework import serializers
 from django.utils.translation import gettext as _
+from rest_framework.authtoken.models import Token
+
+from user.models import UserProfile
 
 
 class UserSerializer(serializers.ModelSerializer):
-    bio = serializers.CharField(max_length=255, allow_blank=True, required=False)
-    profile_image = serializers.ImageField(allow_null=True, required=False, validators=[validate_image_file_extension])
-    subscribers = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
     class Meta:
         model = get_user_model()
-        fields = ("id", "email", "password", "is_staff", "bio", "profile_image", "subscribers")
+        fields = (
+            "id",
+            "email",
+            "password",
+            "is_staff",
+        )
         read_only_fields = ("is_staff",)
         extra_kwargs = {"password": {"write_only": True, "min_length": 5}}
 
@@ -38,14 +43,36 @@ class UserListSerializer(serializers.ModelSerializer):
         fields = ("email", "profile_image")
 
 
-class UserDetailSerializer(serializers.ModelSerializer):
-    bio = serializers.CharField(max_length=255, allow_blank=True, required=False)
-    profile_image = serializers.ImageField(allow_null=True, required=False, validators=[validate_image_file_extension])
+class UserProfileListSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = UserProfile
+        fields = (
+            "id",
+            "username",
+            "first_name",
+            "last_name",
+            "bio",
+            "profile_image",
+            "subscribers",
+        )
+
+
+class UserProfileDetailSerializer(serializers.ModelSerializer):
+
     subscribers = UserListSerializer(many=True, read_only=True)
 
     class Meta:
-        model = get_user_model()
-        fields = ("id", "email", "is_staff", "bio", "profile_image", "subscribers")
+        model = UserProfile
+        fields = (
+            "id",
+            "username",
+            "first_name",
+            "last_name",
+            "bio",
+            "profile_image",
+            "subscribers",
+        )
 
 
 class AuthTokenSerializer(serializers.Serializer):
@@ -69,9 +96,21 @@ class AuthTokenSerializer(serializers.Serializer):
                 msg = _("Unable to log in with provided credentials.")
                 raise serializers.ValidationError(msg, code="authorization")
         else:
-            msg = _("Must include 'username' and 'password'.")
+            msg = _("Must include 'email' and 'password'.")
             raise serializers.ValidationError(msg, code="authorization")
 
         attrs["user"] = user
         return attrs
 
+
+class LogoutSerializer(serializers.Serializer):
+    token = serializers.CharField()
+
+    def validate(self, attrs):
+        token = attrs["token"]
+        try:
+            Token.objects.get(key=token).delete()
+        except Token.DoesNotExist:
+            pass
+
+        return attrs
