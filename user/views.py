@@ -1,13 +1,10 @@
 from django.contrib.auth import get_user_model
-from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema
 from rest_framework import generics, status, viewsets, mixins
 from rest_framework.authentication import TokenAuthentication
-from django.shortcuts import get_object_or_404
-from rest_framework.decorators import api_view, action
-from rest_framework.generics import ListAPIView
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.response import Response
@@ -20,7 +17,9 @@ from user.serializers import (
     UserSerializer,
     AuthTokenSerializer,
     UserListSerializer,
-    LogoutSerializer, UserProfileDetailSerializer, UserProfileListSerializer,
+    LogoutSerializer,
+    UserProfileDetailSerializer,
+    UserProfileListSerializer,
 )
 
 
@@ -71,7 +70,7 @@ class UserProfileViewSet(
     mixins.CreateModelMixin,
     mixins.RetrieveModelMixin,
     mixins.UpdateModelMixin,
-    viewsets.GenericViewSet
+    viewsets.GenericViewSet,
 ):
     queryset = UserProfile.objects.all()
     authentication_classes = (TokenAuthentication,)

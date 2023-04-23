@@ -1,5 +1,4 @@
 from django.contrib.auth import get_user_model, authenticate
-from django.core.validators import validate_image_file_extension
 from rest_framework import serializers
 from django.utils.translation import gettext as _
 from rest_framework.authtoken.models import Token
@@ -8,7 +7,6 @@ from user.models import UserProfile
 
 
 class UserSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = get_user_model()
         fields = (
@@ -36,15 +34,13 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserListSerializer(serializers.ModelSerializer):
-    profile_image = serializers.ImageField()
 
     class Meta:
         model = get_user_model()
-        fields = ("email", "profile_image")
+        fields = ("email",)
 
 
 class UserProfileListSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = UserProfile
         fields = (
@@ -59,7 +55,6 @@ class UserProfileListSerializer(serializers.ModelSerializer):
 
 
 class UserProfileDetailSerializer(serializers.ModelSerializer):
-
     subscribers = UserListSerializer(many=True, read_only=True)
 
     class Meta:
@@ -91,7 +86,10 @@ class AuthTokenSerializer(serializers.Serializer):
             if user:
                 if not user.is_active:
                     msg = _("User account is disabled.")
-                    raise serializers.ValidationError(msg, code="authorization")
+                    raise serializers.ValidationError(
+                        msg,
+                        code="authorization"
+                    )
             else:
                 msg = _("Unable to log in with provided credentials.")
                 raise serializers.ValidationError(msg, code="authorization")

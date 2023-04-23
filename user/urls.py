@@ -12,7 +12,8 @@ from user.views import (
     ManageUserView,
     UserList,
     UserDetail,
-    LogoutView, UserProfileViewSet,
+    LogoutView,
+    UserProfileViewSet,
 )
 
 router = routers.DefaultRouter()
