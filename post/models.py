@@ -1,15 +1,38 @@
+import os
+
+from config import settings
 from django.db import models
-from django.contrib.auth import get_user_model
+
+
+class Tag(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return self.name
 
 
 class Post(models.Model):
-    author = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    TEXT_PREVIEW_LEN = 50
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="posts",
+    )
     title = models.CharField(max_length=255)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+    tags = models.ManyToManyField(Tag, related_name="posts")
 
     class Meta:
-        ordering = ['-created_at']
+        ordering = ["-created_at"]
+
+    @property
+    def text_preview(self) -> str:
+        return (
+            self.content
+            if len(self.content) < Post.TEXT_PREVIEW_LEN
+            else self.content[: Post.TEXT_PREVIEW_LEN] + "..."
+        )
 
     def __str__(self):
         return self.title

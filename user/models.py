@@ -1,4 +1,4 @@
-from django.contrib.auth import get_user_model
+from config import settings
 from django.db import models
 from django.utils.translation import gettext as _
 from django.contrib.auth.models import AbstractUser, BaseUserManager
@@ -44,15 +44,26 @@ class User(AbstractUser):
     username = None
     email = models.EmailField(_("email address"), unique=True)
 
-    bio = models.CharField(max_length=255, blank=True)
-    profile_image = models.ImageField(upload_to='profile_images/', blank=True)
-    subscribers = models.ManyToManyField(
-        'self',
-        related_name='subscriptions',
-        symmetrical=False
-    )
-
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 
     objects = UserManager()
+
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="profile"
+    )
+    username = models.CharField(max_length=255, unique=True)
+    first_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+    bio = models.CharField(max_length=255, blank=True)
+    profile_image = models.ImageField(upload_to="profile_images/", blank=True)
+    subscribers = models.ManyToManyField(
+        settings.AUTH_USER_MODEL, related_name="profiles", blank=True
+    )
+
+    def __str__(self):
+        return self.username
